@@ -1,80 +1,62 @@
-2026-02-08 04:22:09,929 [INFO] search_providers_tool: specialty=doctor radius_km=5.0 user_location=Berlin
-2026-02-08 04:22:12,103 [INFO] search_providers_tool: found=13
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: time_window=this week
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: checking 13 providers
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Hausarztpraxis Avi Spittelmarkt has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider VenaZiel MVZ Berlin Allgemeinmedizin – Hausarztpraxis has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider General Practitioner Yelda Özdem has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Dr. med. Thomas Raile has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Novopraxis Berlin - Thomas Wicke & Dr. med. Sven Schellberg GbR has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Dr. Med. Irina Raileanu has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Martina Schreen Allgemeinmedizin Hausarzt Berlin has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Hausarztpraxis Avi Am Friedrichshain has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Med. Care Center Praxis City Ost has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Praxis Dr. Cordes has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Dr. med. Anne Horlbeck has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Annette Cotanidis und Dr.Funda Villavicencio Lorini has no openings
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: provider Dr. Viet Dinh-Khac has no openings
-2026-02-08 04:22:12,104 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
-2026-02-08 04:22:12,104 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0
-2026-02-08 04:22:13,457 [INFO] check_calendar_free_tool: start=2026-02-10T14:00:00 end=2026-02-10T14:30:00
-2026-02-08 04:22:13,847 [INFO] check_calendar_free_tool: free=True
-2026-02-08 04:22:15,862 [INFO] search_providers_tool: specialty=dentist radius_km=5.0 user_location=Berlin
-2026-02-08 04:22:17,917 [INFO] search_providers_tool: found=14
-2026-02-08 04:24:50,229 [INFO] search_providers_tool: specialty=doctor radius_km=5.0 user_location=Berlin
-2026-02-08 04:24:52,237 [INFO] search_providers_tool: found=13
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: time_window=this week
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: checking 13 providers
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Hausarztpraxis Avi Spittelmarkt has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider VenaZiel MVZ Berlin Allgemeinmedizin – Hausarztpraxis has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider General Practitioner Yelda Özdem has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Dr. med. Thomas Raile has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Novopraxis Berlin - Thomas Wicke & Dr. med. Sven Schellberg GbR has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Dr. Med. Irina Raileanu has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Hausarztpraxis Avi Am Friedrichshain has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Med. Care Center Praxis City Ost has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Gemeinschaftspraxis Dr. Steffen Soll, Dr. Sandra Bachmann, Dr. Julia Bergmann & Dr. Vincent David has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Praxis Dr. Cordes has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Dr. med. Anne Horlbeck has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Annette Cotanidis und Dr.Funda Villavicencio Lorini has no openings
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: provider Dr. Viet Dinh-Khac has no openings
-2026-02-08 04:24:52,238 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
-2026-02-08 04:24:52,238 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: time_window=this week
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: checking 13 providers
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Hausarztpraxis Avi Spittelmarkt has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider VenaZiel MVZ Berlin Allgemeinmedizin – Hausarztpraxis has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider General Practitioner Yelda Özdem has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Dr. med. Thomas Raile has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Novopraxis Berlin - Thomas Wicke & Dr. med. Sven Schellberg GbR has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Dr. Med. Irina Raileanu has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Hausarztpraxis Avi Am Friedrichshain has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Med. Care Center Praxis City Ost has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Gemeinschaftspraxis Dr. Steffen Soll, Dr. Sandra Bachmann, Dr. Julia Bergmann & Dr. Vincent David has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Praxis Dr. Cordes has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Dr. med. Anne Horlbeck has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Annette Cotanidis und Dr.Funda Villavicencio Lorini has no openings
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: provider Dr. Viet Dinh-Khac has no openings
-2026-02-08 04:27:00,134 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
-2026-02-08 04:27:00,134 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0
-2026-02-08 04:27:00,135 [INFO] search_providers_tool: specialty=doctor radius_km=5.0 user_location=Berlin
-2026-02-08 04:27:01,915 [INFO] search_providers_tool: found=13
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: time_window=this week
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: checking 13 providers
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Hausarztpraxis Avi Spittelmarkt has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider VenaZiel MVZ Berlin Allgemeinmedizin – Hausarztpraxis has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider General Practitioner Yelda Özdem has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Dr. med. Thomas Raile has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Novopraxis Berlin - Thomas Wicke & Dr. med. Sven Schellberg GbR has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Dr. Med. Irina Raileanu has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Martina Schreen Allgemeinmedizin Hausarzt Berlin has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Hausarztpraxis Avi Am Friedrichshain has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Med. Care Center Praxis City Ost has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Praxis Dr. Cordes has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Dr. med. Anne Horlbeck has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Annette Cotanidis und Dr.Funda Villavicencio Lorini has no openings
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: provider Dr. Viet Dinh-Khac has no openings
-2026-02-08 04:27:02,750 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
-2026-02-08 04:27:02,750 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0
-2026-02-08 04:27:04,075 [INFO] check_calendar_free_tool: start=2026-02-10T14:00:00 end=2026-02-10T14:30:00
-2026-02-08 04:27:04,203 [INFO] check_calendar_free_tool: free=True
+2026-02-08 05:42:26,127 [INFO] CallPilot MCP Server logger initialized
+2026-02-08 05:58:04,817 [INFO] CallPilot MCP Server logger initialized
+2026-02-08 05:58:32,491 [INFO] search_providers_tool: specialty=dentist radius_km=5.0 user_location=Berlin
+2026-02-08 05:58:34,588 [INFO] search_providers_tool: found=14
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: time_window=this week afternoons
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: checking 14 providers
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider Die Praxis Mitte - Zahnarztpraxis Dr. Christina Erdmann & Dr. Anna Trojan has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider Triadent Berlin Mitte has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider Zahnarztpraxis High Dental Dr. Ivo Hradsky und Kollegen Berlin-Mitte has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider Zahnarzt Berlin Mitte | FAMDENTAL has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Mitte has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider Zahnarzt Berlin-Mitte Dr. Sam Blum und Catia Santos has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider CHECKPOINT DENTIST - Ihr Zahnarzt in Berlin Mitte has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider torhaus - Your Dentists in Berlin has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Prenzlauer Berg has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider Zahnärzte Feuerlandhöfe Berlin Mitte - Dr. Voß & Dr. Wackerbeck - Chausseestrasse 38 has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider Zahnarztpraxis Dr. Olga Joselowitsch & Dr. Leo Khasin - Berlin Kreuzberg has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider Haus Dentist has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider The Urban Dentist has no openings
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: provider Dentist Wahid Sarwghad has no openings
+2026-02-08 05:58:34,590 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
+2026-02-08 05:58:34,590 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0
+2026-02-08 06:00:46,513 [INFO] find_best_appointment_tool: time_window=this week afternoons
+2026-02-08 06:00:46,513 [INFO] find_best_appointment_tool: checking 14 providers
+2026-02-08 06:00:46,513 [INFO] find_best_appointment_tool: provider Die Praxis Mitte - Zahnarztpraxis Dr. Christina Erdmann & Dr. Anna Trojan has no openings
+2026-02-08 06:00:46,513 [INFO] find_best_appointment_tool: provider Triadent Berlin Mitte has no openings
+2026-02-08 06:00:46,513 [INFO] find_best_appointment_tool: provider Zahnarztpraxis High Dental Dr. Ivo Hradsky und Kollegen Berlin-Mitte has no openings
+2026-02-08 06:00:46,513 [INFO] find_best_appointment_tool: provider Zahnarzt Berlin Mitte | FAMDENTAL has no openings
+2026-02-08 06:00:46,513 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Mitte has no openings
+2026-02-08 06:00:46,513 [INFO] find_best_appointment_tool: provider Zahnarzt Berlin-Mitte Dr. Sam Blum und Catia Santos has no openings
+2026-02-08 06:00:46,513 [INFO] find_best_appointment_tool: provider CHECKPOINT DENTIST - Ihr Zahnarzt in Berlin Mitte has no openings
+2026-02-08 06:00:46,514 [INFO] find_best_appointment_tool: provider torhaus - Your Dentists in Berlin has no openings
+2026-02-08 06:00:46,514 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Prenzlauer Berg has no openings
+2026-02-08 06:00:46,514 [INFO] find_best_appointment_tool: provider Zahnärzte Feuerlandhöfe Berlin Mitte - Dr. Voß & Dr. Wackerbeck - Chausseestrasse 38 has no openings
+2026-02-08 06:00:46,514 [INFO] find_best_appointment_tool: provider Zahnarztpraxis Dr. Olga Joselowitsch & Dr. Leo Khasin - Berlin Kreuzberg has no openings
+2026-02-08 06:00:46,514 [INFO] find_best_appointment_tool: provider Haus Dentist has no openings
+2026-02-08 06:00:46,514 [INFO] find_best_appointment_tool: provider The Urban Dentist has no openings
+2026-02-08 06:00:46,514 [INFO] find_best_appointment_tool: provider Dentist Wahid Sarwghad has no openings
+2026-02-08 06:00:46,514 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
+2026-02-08 06:00:46,514 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0
+2026-02-08 06:00:46,514 [INFO] search_providers_tool: specialty=dentist radius_km=5.0 user_location=Berlin
+2026-02-08 06:00:48,527 [INFO] search_providers_tool: found=14
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: time_window=this week afternoons
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: checking 14 providers
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider Die Praxis Mitte - Zahnarztpraxis Dr. Christina Erdmann & Dr. Anna Trojan has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider Triadent Berlin Mitte has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider Zahnarztpraxis High Dental Dr. Ivo Hradsky und Kollegen Berlin-Mitte has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider Zahnarzt Berlin Mitte | FAMDENTAL has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Mitte has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider Zahnarzt Berlin-Mitte Dr. Sam Blum und Catia Santos has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider CHECKPOINT DENTIST - Ihr Zahnarzt in Berlin Mitte has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider torhaus - Your Dentists in Berlin has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Prenzlauer Berg has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider Zahnärzte Feuerlandhöfe Berlin Mitte - Dr. Voß & Dr. Wackerbeck - Chausseestrasse 38 has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider Zahnarztpraxis Dr. Olga Joselowitsch & Dr. Leo Khasin - Berlin Kreuzberg has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider Haus Dentist has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider The Urban Dentist has no openings
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: provider Dentist Wahid Sarwghad has no openings
+2026-02-08 06:04:30,067 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
+2026-02-08 06:04:30,067 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0
+2026-02-08 06:04:30,068 [INFO] search_providers_tool: specialty=dentist radius_km=5.0 user_location=Berlin
+2026-02-08 06:04:31,970 [INFO] search_providers_tool: found=14

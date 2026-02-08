@@ -148,7 +148,7 @@ def get_openings_tool(provider_id: str) -> dict:
 
 
 @mcp.tool()
-def select_best_appointment(time_window: str) -> dict:
+def select_best_appointment(time_window: str, specialty: str, radius_km: float = 5.0, user_location: str = "Berlin") -> dict:
     """Find the best available appointment from previously searched providers.
     
     This tool selects the optimal appointment by:
@@ -161,6 +161,9 @@ def select_best_appointment(time_window: str) -> dict:
     
     Args:
         time_window: Preferred time (e.g., "this week", "tomorrow morning")
+        specialty: Medical specialty to search for (e.g., "dentist")
+        radius_km: Search radius in kilometers (default 5.0)
+        user_location: User's location for proximity search (default "Berlin")
     
     Returns:
         {
@@ -178,8 +181,8 @@ def select_best_appointment(time_window: str) -> dict:
         
         # Check if providers list is populated
         if not providers:
-            logger.warning("find_best_appointment_tool: no providers available")
-            return {"success": False, "error": "No providers found. Please run search_providers_tool first."}
+            providers = search_providers(specialty=specialty, radius_km=radius_km, user_location=user_location)
+            logger.info("search_providers_tool: found=%d", len(providers))
         
         logger.info("find_best_appointment_tool: checking %d providers", len(providers))
         

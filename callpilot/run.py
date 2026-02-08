@@ -14,31 +14,14 @@ def main(export_png: bool = False, use_speech: bool = False):
         path = save_graph_png(app)
         print(f"[OK] Saved graph to: {path}")
 
-    user_text = None
-    if not use_speech:
-        try:
-            user_text = input("Enter your request: ").strip()
-        except EOFError:
-            user_text = None
-
-    # If user provides natural language input, let extraction node populate these
-    # Otherwise use defaults for direct API mode
-    if user_text and user_text.strip():
-        init_state = {
-            "transcript": [],
-            "use_speech": use_speech,
-            "user_text": user_text,
-        }
-    else:
-        init_state = {
+    init_state = {
             "specialty": "dentist",
             "time_window": "this week afternoons",
             "radius_km": 5.0,
             "user_location": "Berlin",
-            "transcript": [],
             "use_speech": use_speech,
-            "user_text": user_text,
-        }
+            "transcript": []
+    }
 
     print("="*60)
     print("🚀 CallPilot Agent - Starting Workflow Execution")
