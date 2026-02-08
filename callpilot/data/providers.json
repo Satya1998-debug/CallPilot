@@ -1,0 +1,27 @@
+[
+  {
+    "id": "p1",
+    "name": "Mitte Dental",
+    "specialty": "dentist",
+    "rating": 4.6,
+    "distance_km": 1.2,
+    "address": "Berlin Mitte",
+    "openings": [
+      {"start": "2026-02-09T15:30:00", "end": "2026-02-09T16:00:00"},
+      {"start": "2026-02-10T15:00:00", "end": "2026-02-10T15:30:00"},
+      {"start": "2026-02-11T16:00:00", "end": "2026-02-11T16:30:00"}
+    ]
+  },
+  {
+    "id": "p2",
+    "name": "Prenzl Smile Clinic",
+    "specialty": "dentist",
+    "rating": 4.9,
+    "distance_km": 3.8,
+    "address": "Prenzlauer Berg, Berlin",
+    "openings": [
+      {"start": "2026-02-09T14:00:00", "end": "2026-02-09T14:30:00"},
+      {"start": "2026-02-12T15:30:00", "end": "2026-02-12T16:00:00"}
+    ]
+  }
+]
