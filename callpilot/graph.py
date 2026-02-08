@@ -591,3 +591,46 @@ def build_graph(use_mcp: bool | None = None):
         use_mcp = os.getenv("USE_MCP", "").lower() in {"1", "true", "yes", "y"}
     if use_mcp:
         return build_graph_mcp()
+    return build_graph_local()
+
+
+def build_graph_local():
+    """Build and compile the local (non-LLM) appointment booking graph."""
+    g = StateGraph(CallState)
+    g.add_node("pick_provider", node_pick_provider)
+    g.add_node("call_provider", node_call_provider)
+    g.add_node("choose_slot", node_choose_slot)
+    g.add_node("reserve_and_book", node_reserve_and_book)
+    g.add_node("done", node_done)
+
+    g.set_entry_point("pick_provider")
+    g.add_edge("pick_provider", "call_provider")
+    g.add_edge("call_provider", "choose_slot")
+    g.add_edge("choose_slot", "reserve_and_book")
+    g.add_edge("reserve_and_book", "done")
+    g.add_edge("done", END)
+
+    return g.compile()
+
+
+def run_local_proposal(init_state: CallState) -> CallState:
+    """Run the local flow up to a proposed slot (no booking)."""
+    state = node_pick_provider(init_state)
+    state = node_call_provider(state)
+    state = node_choose_slot(state)
+
+    proposal = {
+        "provider": state.get("provider"),
+        "slot": state.get("chosen_slot"),
+        "calendar_ok": state.get("calendar_ok"),
+        "error": state.get("error"),
+        "transcript": state.get("transcript", []),
+    }
+    return {**state, "proposal": proposal}
+
+
+def confirm_local_booking(state: CallState) -> CallState:
+    """Finalize booking and calendar event for a proposed slot."""
+    state = node_reserve_and_book(state)
+    state = node_done(state)
+    return state

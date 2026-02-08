@@ -1,39 +1,37 @@
 """Provider search and filtering functionality.
 
-This module provides tools for searching providers via Google Places/Maps.
-
-Note: The MVP local JSON fallback is intentionally disabled.
+This module provides tools for searching providers via Google Places/Maps,
+with a local JSON fallback for demo mode.
 """
 
 from __future__ import annotations
 
+import json
 from typing import Any, Dict, List
 from ..config import settings
 
 
-# def load_providers() -> List[Dict[str, Any]]:
-#     """Load all providers from the JSON database.
+def load_providers() -> List[Dict[str, Any]]:
+    """Load all providers from the JSON database.
     
-#     Reads the provider data file specified in settings.providers_path
-#     and returns the complete list of providers.
-    
-#     Returns:
-#         List of provider dictionaries, each containing:
-#         - id: Unique provider identifier
-#         - name: Provider/practice name
-#         - specialty: Medical specialty
-#         - distance_km: Distance from user in kilometers
-#         - rating: User rating (0-5 scale)
-#         - openings: Available appointment slots
-#         - address: Location string
-    
-#     Example:
-#         >>> providers = load_providers()
-#         >>> print(providers[0]['name'])
-#         'Mitte Dental'
-#     """
-#     with open(settings.providers_path, "r", encoding="utf-8") as f:
-#         return json.load(f)
+    Reads the provider data file specified in settings.providers_path
+    and returns the complete list of providers.
+    """
+    with open(settings.providers_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _search_local_providers(
+    specialty: str,
+    radius_km: float,
+) -> List[Dict[str, Any]]:
+    providers = load_providers()
+    matches = [
+        p for p in providers
+        if p.get("specialty") == specialty and float(p.get("distance_km", 999)) <= radius_km
+    ]
+    matches.sort(key=lambda x: float(x.get("distance_km", 999)))
+    return matches
 
 
 def search_providers(
@@ -43,7 +41,7 @@ def search_providers(
 ) -> List[Dict[str, Any]]:
     """Search for providers matching specialty and distance criteria.
     
-    Uses Google Places API (no local fallback).
+    Uses Google Places API when enabled, otherwise falls back to local JSON.
     
     Args:
         specialty: Medical specialty to search for (e.g., "dentist", "cardiology")
@@ -60,7 +58,7 @@ def search_providers(
         Found 2 dentists within 5km
     """
     if not settings.use_google_apis:
-        raise RuntimeError("Google provider search is disabled (set USE_GOOGLE_APIS=true)")
+        return _search_local_providers(specialty=specialty, radius_km=radius_km)
 
     try:
         from ..integrations.google_places import search_medical_providers
@@ -96,7 +94,6 @@ def search_providers(
         enriched = [p for p in enriched if float(p.get("distance_km", 999)) <= radius_km]
         enriched.sort(key=lambda x: float(x.get("distance_km", 999)))
         return enriched
-    except Exception as e:
-        # No fallback: bubble up a clear error for the caller/tool layer.
-        raise RuntimeError(f"Google provider search failed: {e}") from e
-
+    except Exception:
+        # Fallback to local JSON if Google APIs are unavailable.
+        return _search_local_providers(specialty=specialty, radius_km=radius_km)
