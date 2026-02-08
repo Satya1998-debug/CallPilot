@@ -9,15 +9,18 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 import json
 
-from callpilot.graph import build_graph, run_local_proposal, confirm_local_booking
+from callpilot.graph import _get_tools_async, build_graph, run_local_proposal, confirm_local_booking
 
 app = FastAPI(title="CallPilot API", version="0.1.0")
 
-
+@app.on_event("startup")
+async def startup():
+    app.state.mcp_tools = await _get_tools_async()
+    
 async def _run_graph_async(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Run the graph workflow asynchronously (supports both MCP and local modes)."""
     use_mcp = os.getenv("USE_MCP", "").lower() in {"1", "true", "yes", "y"}
-    app_graph = build_graph(use_mcp=use_mcp)
+    app_graph = build_graph(use_mcp=use_mcp, mcp_tools=app.state.mcp_tools if use_mcp else None)
 
     init_state: Dict[str, Any] = {
         "specialty": payload.get("specialty", "dentist"),
@@ -145,49 +148,6 @@ async def confirm_callpilot(req: ConfirmRequest) -> ConfirmResponse:
     return ConfirmResponse(result=result)
 
 
-@app.post("/run_mcp")
-async def run_mcp_workflow(req: RunRequest) -> Dict[str, Any]:
-    """Run the MCP-based LLM agent workflow.
-    
-    This endpoint forces MCP mode regardless of the USE_MCP env variable.
-    Returns the complete final state including messages, best_option, and event_id.
-    """
-    # Force MCP mode for this endpoint
-    original_use_mcp = os.getenv("USE_MCP")
-    os.environ["USE_MCP"] = "true"
-    
-    try:
-        app_graph = build_graph(use_mcp=True)
-        
-        init_state: Dict[str, Any] = {
-            "specialty": req.specialty,
-            "time_window": req.time_window,
-            "radius_km": float(req.radius_km or 5.0),
-            "user_location": req.user_location,
-            "transcript": [],
-            "use_speech": False,
-            "user_text": req.user_text,
-        }
-        
-        final_state = await app_graph.ainvoke(init_state)
-        
-        # Extract relevant information
-        return {
-            "result_text": final_state.get("result_text", ""),
-            "best_option": final_state.get("best_option", {}),
-            "event_id": final_state.get("event_id"),
-            "messages_count": len(final_state.get("messages", [])),
-            "specialty": final_state.get("specialty"),
-            "user_location": final_state.get("user_location"),
-        }
-    finally:
-        # Restore original USE_MCP value
-        if original_use_mcp is not None:
-            os.environ["USE_MCP"] = original_use_mcp
-        else:
-            os.environ.pop("USE_MCP", None)
-
-
 @app.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest) -> ChatResponse:
     """Handle chat messages directly from the UI.
@@ -203,7 +163,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             original_use_mcp = os.getenv("USE_MCP")
             os.environ["USE_MCP"] = "true"
             
-            app_graph = build_graph(use_mcp=True)
+            app_graph = build_graph(use_mcp=True, mcp_tools=app.state.mcp_tools)
             
             init_state: Dict[str, Any] = {
                 "transcript": [],

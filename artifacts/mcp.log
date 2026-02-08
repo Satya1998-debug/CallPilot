@@ -61,3 +61,70 @@
 2026-02-08 06:04:30,068 [INFO] search_providers_tool: specialty=dentist radius_km=5.0 user_location=Berlin
 2026-02-08 06:04:31,970 [INFO] search_providers_tool: found=14
 2026-02-08 09:59:35,404 [INFO] CallPilot MCP Server logger initialized
+2026-02-08 11:43:34,330 [INFO] search_providers_tool: specialty=dentist radius_km=5.0 user_location=Berlin
+2026-02-08 11:43:36,567 [INFO] search_providers_tool: found=15
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: time_window=this week
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: checking 15 providers
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider Die Praxis Mitte - Zahnarztpraxis Dr. Christina Erdmann & Dr. Anna Trojan has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider Triadent Berlin Mitte has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider Zahnarzt Berlin Mitte | FAMDENTAL has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider F80 – Die Zahn- und Gesichtsspezialisten – Berlin-Mitte has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider AllDent Zahnzentrum Berlin has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Mitte has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider CHECKPOINT DENTIST - Ihr Zahnarzt in Berlin Mitte has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider torhaus - Your Dentists in Berlin has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Prenzlauer Berg has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider Zahnarztpraxis Dr. Olga Joselowitsch & Dr. Leo Khasin - Berlin Kreuzberg has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider MVZ Zahnärzte am Weddingplatz has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider Medeco dental clinic Berlin Wedding has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider Haus Dentist has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider The Urban Dentist has no openings
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: provider Dentist Wahid Sarwghad has no openings
+2026-02-08 11:43:36,570 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
+2026-02-08 11:43:36,570 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0
+2026-02-08 12:18:01,494 [INFO] search_providers_tool: specialty=cardiologist radius_km=5.0 user_location=Berlin
+2026-02-08 12:18:03,804 [INFO] search_providers_tool: found=10
+2026-02-08 12:20:21,790 [INFO] search_providers_tool: specialty=dentist radius_km=5.0 user_location=Berlin
+2026-02-08 12:20:23,915 [INFO] search_providers_tool: found=15
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: time_window=this week
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: checking 15 providers
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider Die Praxis Mitte - Zahnarztpraxis Dr. Christina Erdmann & Dr. Anna Trojan has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider Triadent Berlin Mitte has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider Zahnarzt Berlin Mitte | FAMDENTAL has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider F80 – Die Zahn- und Gesichtsspezialisten – Berlin-Mitte has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider AllDent Zahnzentrum Berlin has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Mitte has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider CHECKPOINT DENTIST - Ihr Zahnarzt in Berlin Mitte has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider torhaus - Your Dentists in Berlin has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Prenzlauer Berg has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider Zahnarztpraxis Dr. Olga Joselowitsch & Dr. Leo Khasin - Berlin Kreuzberg has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider MVZ Zahnärzte am Weddingplatz has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider Medeco dental clinic Berlin Wedding has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider Haus Dentist has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider The Urban Dentist has no openings
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: provider Dentist Wahid Sarwghad has no openings
+2026-02-08 12:20:23,917 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
+2026-02-08 12:20:23,917 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0
+2026-02-08 12:26:40,789 [INFO] search_providers_tool: specialty=dentist radius_km=5.0 user_location=Berlin
+2026-02-08 12:26:43,037 [INFO] search_providers_tool: found=15
+2026-02-08 12:28:26,867 [INFO] search_providers_tool: specialty=dentist radius_km=5.0 user_location=Berlin
+2026-02-08 12:28:28,235 [INFO] search_providers_tool: found=15
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: time_window=this week
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: checking 15 providers
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider Die Praxis Mitte - Zahnarztpraxis Dr. Christina Erdmann & Dr. Anna Trojan has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider Triadent Berlin Mitte has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider Zahnarzt Berlin Mitte | FAMDENTAL has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider F80 – Die Zahn- und Gesichtsspezialisten – Berlin-Mitte has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider AllDent Zahnzentrum Berlin has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Mitte has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider CHECKPOINT DENTIST - Ihr Zahnarzt in Berlin Mitte has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider torhaus - Your Dentists in Berlin has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider MEINDENTIST-Praxis Prenzlauer Berg has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider Zahnarztpraxis Dr. Olga Joselowitsch & Dr. Leo Khasin - Berlin Kreuzberg has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider MVZ Zahnärzte am Weddingplatz has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider Medeco dental clinic Berlin Wedding has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider Haus Dentist has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider The Urban Dentist has no openings
+2026-02-08 12:28:28,237 [INFO] find_best_appointment_tool: provider Dentist Wahid Sarwghad has no openings
+2026-02-08 12:28:28,237 [WARNING] find_best_appointment_tool: no available slots found....creating a dummy appointment option for demonstration purposes
+2026-02-08 12:28:28,238 [INFO] find_best_appointment_tool: best appointment selected - provider=Demo Healthcare Provider score=-1.0

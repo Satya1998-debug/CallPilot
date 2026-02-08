@@ -48,6 +48,7 @@ Pillow>=10.2.0
 
 # === Audio Processing ===
 elevenlabs>=1.0.0
+audio-recorder-streamlit>=0.0.8  # Real-time microphone recording
 # openai-whisper>=20231117  # Uncomment for speech-to-text
 
 # === Google APIs ===

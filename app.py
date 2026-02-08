@@ -6,11 +6,23 @@ from typing import Any, Dict, Optional, Tuple
 import requests
 import streamlit as st
 
+try:
+    from audio_recorder_streamlit import audio_recorder
+    AUDIO_RECORDER_AVAILABLE = True
+except ImportError as e:
+    AUDIO_RECORDER_AVAILABLE = False
+    import sys
+    print(f"❌ Failed to import audio_recorder_streamlit: {e}", file=sys.stderr)
+    print(f"Python executable: {sys.executable}", file=sys.stderr)
+    print(f"Python path: {sys.path}", file=sys.stderr)
+
 st.set_page_config(page_title="CallPilot", page_icon="📞", layout="wide")
 
 st.title("CallPilot")
 st.caption("Agentic appointment booking demo")
 
+from dotenv import load_dotenv
+load_dotenv()
 
 def _elevenlabs_tts(text: str) -> Optional[bytes]:
     api_key = os.getenv("ELEVENLABS_API_KEY")
@@ -36,21 +48,30 @@ def _elevenlabs_tts(text: str) -> Optional[bytes]:
 def _elevenlabs_stt(audio_bytes: bytes, mime_type: str) -> Optional[str]:
     api_key = os.getenv("ELEVENLABS_API_KEY")
     if not api_key:
-        return None
+        raise ValueError("ELEVENLABS_API_KEY not found in environment")
     try:
         from elevenlabs.client import ElevenLabs
         client = ElevenLabs(api_key=api_key)
-        # Best-effort: API may differ; handle missing gracefully.
         stt = getattr(client, "speech_to_text", None)
-        if stt and hasattr(stt, "convert"):
-            result = stt.convert(audio=audio_bytes, mime_type=mime_type)
-            if isinstance(result, dict) and "text" in result:
-                return result["text"]
-            if hasattr(result, "text"):
-                return result.text
-        return None
-    except Exception:
-        return None
+        if not stt:
+            raise ValueError("speech_to_text module not available in ElevenLabs client")
+        if not hasattr(stt, "convert"):
+            raise ValueError("convert method not found in speech_to_text module")
+        
+        # Correct API signature: convert(model_id=..., file=...)
+        # Available models: 'scribe_v1', 'scribe_v1_experimental', 'scribe_v2'
+        model_id = os.getenv("ELEVENLABS_STT_MODEL_ID", "scribe_v2")
+        result = stt.convert(model_id=model_id, file=audio_bytes)
+        
+        if isinstance(result, dict) and "text" in result:
+            return result["text"]
+        if hasattr(result, "text"):
+            return result.text
+        
+        raise ValueError(f"Unexpected result format from STT: {type(result)}")
+    except Exception as e:
+        # Re-raise so caller can see the real error
+        raise Exception(f"STT failed: {str(e)}") from e
 
 
 def _render_proposal(proposal: Dict[str, Any]) -> None:
@@ -76,7 +97,7 @@ def _render_proposal(proposal: Dict[str, Any]) -> None:
 with st.sidebar:
     st.header("Run Mode")
     use_mcp = st.checkbox("Use MCP/LLM Agent Mode", value=os.getenv("USE_MCP", "").lower() in {"1", "true", "yes", "y"})
-    api_url = st.text_input("Backend API URL", value=os.getenv("CALLPILOT_API_URL", "http://localhost:8000"))
+    api_url = st.text_input("Backend API URL", value=os.getenv("CALLPILOT_API_URL"))
     st.info("💡 All queries are processed through the backend API")
     st.divider()
     st.header("Inputs")
@@ -103,11 +124,31 @@ with st.sidebar:
 
 audio_blob: Optional[Tuple[bytes, str]] = None
 if input_mode == "Speech":
-    st.subheader("Speech Input")
-    audio_file = st.file_uploader("Upload audio (wav/mp3/m4a)", type=["wav", "mp3", "m4a"])
-    if audio_file is not None:
-        audio_blob = (audio_file.read(), audio_file.type or "audio/wav")
-        st.audio(audio_blob[0], format=audio_blob[1])
+    st.subheader("🎤 Speech Input")
+    
+    # Real-time microphone recording
+    if AUDIO_RECORDER_AVAILABLE:
+        st.info("Click the microphone to start recording, click again to stop")
+        audio_bytes = audio_recorder(
+            pause_threshold=2.0,
+            sample_rate=16000,
+            text="",
+            recording_color="#e74c3c",
+            neutral_color="#6c757d",
+            icon_size="2x"
+        )
+        if audio_bytes:
+            audio_blob = (audio_bytes, "audio/wav")
+            st.audio(audio_bytes, format="audio/wav")
+    else:
+        st.warning("⚠️ Real-time recording not available. Install: `pip install audio-recorder-streamlit`")
+    
+    # Fallback: file upload option
+    with st.expander("📁 Or upload an audio file"):
+        audio_file = st.file_uploader("Upload audio (wav/mp3/m4a)", type=["wav", "mp3", "m4a"])
+        if audio_file is not None:
+            audio_blob = (audio_file.read(), audio_file.type or "audio/wav")
+            st.audio(audio_blob[0], format=audio_blob[1])
 
 
 payload: Dict[str, Any] = {
@@ -161,21 +202,6 @@ for msg in st.session_state.chat_messages:
             with st.expander("📋 Appointment Details"):
                 st.json(appt)
 
-# Handle audio input for speech mode
-if input_mode == "Speech" and enable_speech:
-    st.info("🎤 Speech Mode: Upload an audio file or use the chat input below")
-    if audio_blob:
-        with st.spinner("Transcribing audio..."):
-            transcript = _elevenlabs_stt(audio_blob[0], audio_blob[1])
-            if transcript:
-                # Add transcribed message to chat
-                st.session_state.chat_messages.append({"role": "user", "content": transcript})
-                payload["user_text"] = transcript
-                st.session_state.processing = True
-                st.rerun()
-
-# Chat input handling
-text_prompt = st.chat_input("Tell me what you want to book..." if use_mcp else "Describe your appointment needs")
 
 def process_user_message(user_message: str):
     """Process user message via backend API and get agent/workflow response."""
@@ -240,6 +266,79 @@ def process_user_message(user_message: str):
     
     st.session_state.chat_messages.append(msg_data)
     return True
+
+
+# Handle audio input for speech mode
+if input_mode == "Speech" and audio_blob:
+    # Track processed audio to avoid re-processing on rerun
+    if "last_audio_hash" not in st.session_state:
+        st.session_state.last_audio_hash = None
+    
+    current_audio_hash = hash(audio_blob[0])
+    
+    if current_audio_hash != st.session_state.last_audio_hash:
+        with st.spinner("🎤 Transcribing audio..."):
+            try:
+                transcript = _elevenlabs_stt(audio_blob[0], audio_blob[1])
+                if transcript:
+                    st.session_state.last_audio_hash = current_audio_hash
+                    st.success(f"📝 Transcribed: \"{transcript}\"")
+                    # Process the transcribed message through the same flow as text
+                    process_user_message(transcript)
+                    st.rerun()
+                else:
+                    st.error("❌ Transcription returned empty result")
+            except Exception as e:
+                st.error(f"❌ Transcription error: {str(e)}")
+
+# Voice input section - always visible
+st.markdown("---")
+st.markdown("### 🎤 Voice Input")
+st.caption(f"Debug: AUDIO_RECORDER_AVAILABLE = {AUDIO_RECORDER_AVAILABLE}")
+if AUDIO_RECORDER_AVAILABLE:
+    st.caption("Click the microphone to record, click again to stop")
+    recorded_audio = audio_recorder(
+        pause_threshold=2.0,
+        sample_rate=16000,
+        text="Click to record",
+        recording_color="#e74c3c",
+        neutral_color="#3498db",
+        icon_size="3x"
+    )
+    
+    # Handle recorded audio
+    if recorded_audio:
+        if "last_recorded_hash" not in st.session_state:
+            st.session_state.last_recorded_hash = None
+        
+        current_hash = hash(recorded_audio)
+        if current_hash != st.session_state.last_recorded_hash:
+            st.session_state.last_recorded_hash = current_hash
+            st.audio(recorded_audio, format="audio/wav")
+            with st.spinner("🎤 Transcribing your speech..."):
+                try:
+                    transcript = _elevenlabs_stt(recorded_audio, "audio/wav")
+                    if transcript:
+                        st.success(f"📝 You said: \"{transcript}\"")
+                        process_user_message(transcript)
+                        st.rerun()
+                    else:
+                        st.error("❌ Transcription returned empty result")
+                except Exception as e:
+                    st.error(f"❌ Transcription error: {str(e)}")
+                    with st.expander("🔍 Debug info"):
+                        st.code(f"API Key present: {bool(os.getenv('ELEVENLABS_API_KEY'))}")
+                        st.code(f"Audio size: {len(recorded_audio)} bytes")
+                        st.code(f"Error: {e}")
+else:
+    import sys
+    st.warning("⚠️ Voice recording not available.")
+    st.code(f"Python: {sys.executable}")
+    st.info("Try: Restart Streamlit or check terminal for import errors")
+
+st.markdown("---")
+st.markdown("### ⌨️ Text Input")
+text_prompt = st.chat_input("Type your request here...")
 
 # Process new message if provided
 if text_prompt:

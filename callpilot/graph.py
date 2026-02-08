@@ -28,29 +28,32 @@ _mcp_graph_cache = None
 def node_listen_user(state: CallState) -> CallState:
     """Optional speech-to-text hook (expects external STT to fill user_text)."""
     print("\n🔹 Executing Node: listen_user")
-    if not state.get("use_speech"):
-        try:
-            user_text = input("Enter your request: ").strip()
-            user_text = user_text.strip()  # Remove extra quotes if present
-        except EOFError:
-            user_text = None
-    else:
-        # seech to-text is expected to fill "user_text" in the state, so we just read it here
-        load_dotenv()
-        elevenlabs = ElevenLabs(
-        api_key=os.getenv("ELEVENLABS_API_KEY"),
-        )
-        audio_url = ("https://storage.googleapis.com/eleven-public-cdn/audio/marketing/nicole.mp3")
-        response = requests.get(audio_url)
-        audio_data = BytesIO(response.content)
-        transcription = elevenlabs.speech_to_text.convert(
-            file=audio_data,
-            model_id="scribe_v2", # Model to use
-            tag_audio_events=True, # Tag audio events like laughter, applause, etc.
-            language_code="eng", # Language of the audio file. If set to None, the model will detect the language automatically.
-            diarize=True, # Whether to annotate who is speaking
-        )
-        user_text = transcription.text.strip()
+    user_text = state.get("user_text", "").strip()
+    # if not state.get("use_speech"):
+    #     try:
+    #         user_text = input("Enter your request: ").strip()
+    #         user_text = user_text.strip()  # Remove extra quotes if present
+    #     except EOFError:
+    #         user_text = None
+    # else:
+    #     user_text = state.get("user_text") # get from fastAPI
+    # else:
+    #     # seech to-text is expected to fill "user_text" in the state, so we just read it here
+    #     load_dotenv()
+    #     elevenlabs = ElevenLabs(
+    #     api_key=os.getenv("ELEVENLABS_API_KEY"),
+    #     )
+    #     audio_url = ("https://storage.googleapis.com/eleven-public-cdn/audio/marketing/nicole.mp3")
+    #     response = requests.get(audio_url)
+    #     audio_data = BytesIO(response.content)
+    #     transcription = elevenlabs.speech_to_text.convert(
+    #         file=audio_data,
+    #         model_id="scribe_v2", # Model to use
+    #         tag_audio_events=True, # Tag audio events like laughter, applause, etc.
+    #         language_code="eng", # Language of the audio file. If set to None, the model will detect the language automatically.
+    #         diarize=True, # Whether to annotate who is speaking
+    #     )
+    #     user_text = transcription.text.strip()
 
     transcript = state.get("transcript", []) + [f"[USER] {user_text}"]
     return {**state, "transcript": transcript}
@@ -263,7 +266,7 @@ def get_tools_sync():
     """Use this in CLI mode (python main.py)."""
     return asyncio.run(_get_tools_async())
 
-def build_graph_mcp():
+def build_graph_mcp(mcp_tools: List[dict] | None = None):
     """Build and compile the LLM + MCP tool-calling graph."""
     global _mcp_graph_cache
     
@@ -295,7 +298,7 @@ def build_graph_mcp():
 
     # No event loop running, safe to use asyncio.run
     # tools = asyncio.run(get_mcp_tools())
-    tools = get_tools_sync()
+    tools = mcp_tools
     
     def node_extract_preferences(state: CallState) -> CallState:
         """Extract appointment preferences from user's natural language query.
@@ -709,12 +712,12 @@ def build_graph_mcp():
     return _mcp_graph_cache
 
 
-def build_graph(use_mcp: bool | None = None):
+def build_graph(use_mcp: bool | None = None, mcp_tools: List[dict] | None = None):
     """Build and compile the appointment booking graph."""
     if use_mcp is None:
         use_mcp = os.getenv("USE_MCP", "").lower() in {"1", "true", "yes", "y"}
     if use_mcp:
-        return build_graph_mcp()
+        return build_graph_mcp(mcp_tools)
     return build_graph_local()
 
 
