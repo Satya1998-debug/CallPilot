@@ -12,7 +12,7 @@ sys.path.insert(0, str(project_root))
 from callpilot.run import main
 
 if __name__ == "__main__":
-    # export = "--graph" in sys.argv
-    export = True
+    export = "--graph" in sys.argv
+    # export = True
     use_speech = "--speech" in sys.argv
     main(export_png=export, use_speech=use_speech)

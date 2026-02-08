@@ -211,8 +211,8 @@ def build_graph_mcp():
 
     default_mcp_url = os.getenv("MCP_URL", "http://localhost:8000/mcp")
     llm_provider = os.getenv("LLM_PROVIDER", "ollama").lower()
-    default_openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-    default_ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:3b")
+    #default_openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    default_ollama_model = os.getenv("OLLAMA_MODEL", "qwen3:4b")
     default_ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
     async def get_mcp_client():

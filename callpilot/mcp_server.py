@@ -11,16 +11,40 @@ from .tools.scoring import score as score_fn
 
 mcp = FastMCP("CallPilot Tools", json_response=True)
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+# Configure logging with forced override and immediate flushing
+logging.basicConfig(
+    level=logging.INFO, 
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    force=True
+)
 logger = logging.getLogger("callpilot.mcp")
+logger.setLevel(logging.INFO)
+logger.propagate = False  # Don't propagate to root logger
 
-# Log to file in artifacts/
+# Custom handler that flushes immediately
+class FlushFileHandler(logging.FileHandler):
+    def emit(self, record):
+        super().emit(record)
+        self.flush()
+
+# Log to file in artifacts/ with immediate flushing
 _log_path = Path("artifacts/mcp.log")
 _log_path.parent.mkdir(parents=True, exist_ok=True)
-_file_handler = logging.FileHandler(_log_path)
+
+# File handler that flushes after every write
+_file_handler = FlushFileHandler(_log_path, mode='a')
 _file_handler.setLevel(logging.INFO)
 _file_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
 logger.addHandler(_file_handler)
+
+# Console handler to see logs in terminal too
+_console_handler = logging.StreamHandler()
+_console_handler.setLevel(logging.INFO)
+_console_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
+logger.addHandler(_console_handler)
+
+# Log server initialization
+logger.info("CallPilot MCP Server logger initialized")
 
 
 @mcp.tool()

@@ -56,7 +56,7 @@ python-dotenv>=1.0.0
 tqdm>=4.66.0
 pydantic>=2.6.0
 pydot>=2.0.0
-pygraphviz>=1.11
+# pygraphviz>=1.11
 
 # === Dev Tools (optional) ===
 # black>=24.1.0
