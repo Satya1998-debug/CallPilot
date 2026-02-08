@@ -107,7 +107,8 @@ payload: Dict[str, Any] = {
     "user_text": user_text.strip() or None,
 }
 
-run = st.button("Propose Appointment", type="primary")
+if "chat_messages" not in st.session_state:
+    st.session_state.chat_messages = []
 
 if "proposal_state" not in st.session_state:
     st.session_state.proposal_state = None
@@ -116,12 +117,25 @@ if "proposal" not in st.session_state:
 if "final_result" not in st.session_state:
     st.session_state.final_result = None
 
+st.subheader("Chat")
+for msg in st.session_state.chat_messages:
+    with st.chat_message(msg["role"]):
+        st.write(msg["content"])
+
+text_prompt = st.chat_input("Tell me what you want to book")
+if text_prompt:
+    st.session_state.chat_messages.append({"role": "user", "content": text_prompt})
+    payload["user_text"] = text_prompt
+
+run = st.button("Find Appointment", type="primary")
+
 if run:
     with st.spinner("Running workflow..."):
         if input_mode == "Speech" and enable_speech and audio_blob:
             transcript = _elevenlabs_stt(audio_blob[0], audio_blob[1])
             if transcript:
                 payload["user_text"] = transcript
+                st.session_state.chat_messages.append({"role": "user", "content": transcript})
                 st.info(f"Transcribed: {transcript}")
             else:
                 st.warning("Speech transcription unavailable; using structured inputs.")
