@@ -3,7 +3,6 @@ Tools package for CallPilot
 """
 
 from .providers import (
-    load_providers,
     search_providers,
 )
 
@@ -17,7 +16,6 @@ from .scoring import (
 )
 
 __all__ = [
-    "load_providers",
     "search_providers",
     "check_calendar_free",
     "create_calendar_event",

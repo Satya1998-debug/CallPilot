@@ -67,5 +67,9 @@ class CallState(TypedDict, total=False):
     use_speech: bool
     user_text: Optional[str]
 
+    # Extracted preferences from natural language
+    preferred_provider: Optional[str]
+    urgency: Optional[str]
+
     # Errors
     error: Optional[str]

@@ -21,15 +21,24 @@ def main(export_png: bool = False, use_speech: bool = False):
         except EOFError:
             user_text = None
 
-    init_state = {
-        "specialty": "dentist",
-        "time_window": "this week afternoons",
-        "radius_km": 5.0,
-        "user_location": "Berlin",
-        "transcript": [],
-        "use_speech": use_speech,
-        "user_text": user_text,
-    }
+    # If user provides natural language input, let extraction node populate these
+    # Otherwise use defaults for direct API mode
+    if user_text and user_text.strip():
+        init_state = {
+            "transcript": [],
+            "use_speech": use_speech,
+            "user_text": user_text,
+        }
+    else:
+        init_state = {
+            "specialty": "dentist",
+            "time_window": "this week afternoons",
+            "radius_km": 5.0,
+            "user_location": "Berlin",
+            "transcript": [],
+            "use_speech": use_speech,
+            "user_text": user_text,
+        }
 
     print("="*60)
     print("🚀 CallPilot Agent - Starting Workflow Execution")

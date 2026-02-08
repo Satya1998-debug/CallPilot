@@ -4,7 +4,7 @@ import os
 from typing import Any, Dict, List
 
 from langgraph.graph import StateGraph, END
-
+import json
 from .state import CallState
 from .tools.providers import search_providers
 from .adapters.receptionist_sim import simulate_receptionist_call, reserve_slot
@@ -67,9 +67,14 @@ def node_pick_provider(state: CallState) -> CallState:
     print("\n🔹 Executing Node: pick_provider")
     specialty = state.get("specialty", "dentist")
     radius = float(state.get("radius_km", 5.0))
+    user_location = state.get("user_location", "Berlin")
 
-    # Use local search function
-    matches = search_providers(specialty=specialty, radius_km=radius)
+    # Use local search function with user location
+    matches = search_providers(
+        specialty=specialty,
+        radius_km=radius,
+        user_location=user_location
+    )
     
     if not matches:
         return {**state, "error": "No providers found in radius."}
@@ -211,8 +216,8 @@ def build_graph_mcp():
 
     default_mcp_url = os.getenv("MCP_URL", "http://localhost:8000/mcp")
     llm_provider = os.getenv("LLM_PROVIDER", "ollama").lower()
-    #default_openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-    default_ollama_model = os.getenv("OLLAMA_MODEL", "qwen3:4b")
+    default_openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    default_ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
     default_ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
     async def get_mcp_client():
@@ -231,6 +236,145 @@ def build_graph_mcp():
 
     tools = asyncio.run(get_mcp_tools())
 
+    def node_extract_preferences(state: CallState) -> CallState:
+        """Extract appointment preferences from user's natural language query.
+        
+        Uses LLM to parse user input and extract structured information like:
+        - Medical specialty (if not already set)
+        - Time preferences and constraints
+        - Distance/location preferences
+        - Specific provider names
+        - Other booking preferences
+        """
+        print("\n🔹 Executing Node: extract_preferences")
+        user_text = state.get("user_text", "")
+        
+        # Skip extraction if no user text
+        if not user_text or not user_text.strip():
+            # Set defaults if not already set
+            updates = {}
+            if not state.get("specialty"):
+                updates["specialty"] = "dentist"
+            if not state.get("time_window"):
+                updates["time_window"] = "this week"
+            if not state.get("radius_km"):
+                updates["radius_km"] = 5.0
+            if not state.get("user_location"):
+                updates["user_location"] = "Berlin"
+            if updates:
+                return {**state, **updates}
+            return state
+        
+        # Initialize LLM for extraction
+        if llm_provider == "ollama":
+            from langchain_ollama import ChatOllama
+            extraction_model = ChatOllama(
+                model=default_ollama_model,
+                base_url=default_ollama_url,
+                temperature=0.1,  # Low temperature for consistent extraction
+            )
+        else:
+            from langchain_openai import ChatOpenAI
+            extraction_model = ChatOpenAI(model=default_openai_model, temperature=0.1)
+        
+        # Create extraction prompt
+        extraction_prompt = f"""Extract appointment booking preferences from the user's request.
+Parse the following user query and extract structured information:
+
+User Query: "{user_text}"
+
+Current state:
+- Specialty: {state.get('specialty', 'NOT SET')}
+- Time window: {state.get('time_window', 'NOT SET')}
+- Radius (km): {state.get('radius_km', 'NOT SET')}
+- User location: {state.get('user_location', 'NOT SET')}
+
+Extract and return ONLY a JSON object with these fields (use null if not mentioned):
+{{
+    "specialty": "medical specialty (dentist, doctor, cardiologist, etc.) or null",
+    "time_window": "time preference (this week, tomorrow, next Monday, afternoon, etc.) or null",
+    "radius_km": "preferred distance in kilometers as number or null",
+    "location_preference": "any location hints (close to me, near X, etc.) or null",
+    "provider_name": "specific provider name mentioned or null",
+    "urgency": "urgency level (urgent, asap, flexible, etc.) or null"
+}}
+
+Return ONLY the JSON, nothing else."""
+
+        try:
+            response = extraction_model.invoke(extraction_prompt)
+            content = response.content.strip()
+            
+            # Extract JSON from response
+            import json
+            import re
+            
+            # Try to find JSON in the response
+            json_match = re.search(r'\{[^{}]*\}', content, re.DOTALL)
+            if json_match:
+                extracted = json.loads(json_match.group())
+                
+                # Update state with extracted values (only if not already set)
+                updates = {}
+                
+                if extracted.get("specialty") and not state.get("specialty"):
+                    updates["specialty"] = extracted["specialty"]
+                
+                if extracted.get("time_window") and not state.get("time_window"):
+                    updates["time_window"] = extracted["time_window"]
+                
+                if extracted.get("radius_km") and not state.get("radius_km"):
+                    try:
+                        updates["radius_km"] = float(extracted["radius_km"])
+                    except (ValueError, TypeError):
+                        pass
+                
+                if extracted.get("location_preference"):
+                    # Use location preference to adjust radius if "close" mentioned
+                    loc_pref = extracted["location_preference"].lower()
+                    if "close" in loc_pref or "near" in loc_pref or "nearby" in loc_pref:
+                        updates["radius_km"] = min(state.get("radius_km", 5.0), 3.0)
+                
+                if extracted.get("provider_name"):
+                    updates["preferred_provider"] = extracted["provider_name"]
+                
+                if extracted.get("urgency"):
+                    updates["urgency"] = extracted["urgency"]
+                
+                # Set defaults for missing required fields
+                if not updates.get("specialty") and not state.get("specialty"):
+                    updates["specialty"] = "dentist"
+                if not updates.get("time_window") and not state.get("time_window"):
+                    updates["time_window"] = "this week"
+                if not updates.get("radius_km") and not state.get("radius_km"):
+                    updates["radius_km"] = 5.0
+                if not updates.get("user_location") and not state.get("user_location"):
+                    updates["user_location"] = "Berlin"
+                
+                if updates:
+                    print(f"✓ Extracted preferences: {updates}")
+                    return {**state, **updates}
+            
+        except Exception as e:
+            print(f"⚠️  Preference extraction failed: {e}")
+        
+        # Fallback: set defaults if extraction failed
+        updates = {}
+        if not state.get("specialty"):
+            updates["specialty"] = "dentist"
+        if not state.get("time_window"):
+            updates["time_window"] = "this week"
+        if not state.get("radius_km"):
+            updates["radius_km"] = 5.0
+        if not state.get("user_location"):
+            updates["user_location"] = "Berlin"
+        
+        if updates:
+            print(f"✓ Using defaults: {updates}")
+            return {**state, **updates}
+        
+        return state
+
     def node_init_messages(state: CallState) -> CallState:
         if state.get("messages"):
             return state
@@ -239,57 +383,174 @@ def build_graph_mcp():
         time_window = state.get("time_window", "this week")
         radius = state.get("radius_km", 5.0)
         location = state.get("user_location", "unknown")
+        preferred_provider = state.get("preferred_provider")
+        urgency = state.get("urgency")
 
         system = SystemMessage(
             content=(
-                "You are CallPilot, an appointment-booking agent. "
-                "Use the available tools to find providers, check openings, "
-                "verify calendar availability, reserve a slot, and create a calendar event. "
-                "Return a concise JSON summary when finished."
+                "You are CallPilot, an AI appointment-booking assistant. "
+                "Your job is to help users book appointments. "
+                "Use the relevant tools to search for providers first."
+                "From there, find available appointment slots, "
+                "check them against the user's calendar, call tools for checking availability, reserve the best option, "
+                "then score and select the best option. "
             )
         )
+        
+        # Build constraints string with optional preferences
+        constraints = (
+            f"- specialty: {specialty}\n"
+            f"- time_window: {time_window}\n"
+            f"- radius_km: {radius}\n"
+            f"- user_location: {location}\n"
+        )
+        if preferred_provider:
+            constraints += f"- preferred_provider: {preferred_provider} (prioritize this provider if available)\n"
+        if urgency:
+            constraints += f"- urgency: {urgency} (consider when selecting slots)\n"
+        
         user = HumanMessage(
             content=(
                 "Book an appointment with these constraints:\n"
-                f"- specialty: {specialty}\n"
-                f"- time_window: {time_window}\n"
-                f"- radius_km: {radius}\n"
-                f"- user_location: {location}\n\n"
-                "Use tools in this order if needed:\n"
-                "1) search_providers_tool\n"
-                "2) get_openings_tool\n"
-                "3) check_calendar_free_tool\n"
-                "4) reserve_slot_tool\n"
-                "5) create_calendar_event_tool\n"
-                "6) score_option_tool\n\n"
-                "Finish by returning JSON with keys: provider, slot, score, event_id."
+                f"{constraints}\n"
+                "  1. Search for providers matching the specialty\n"
+                "  2. Find available appointment slots\n"
+                "  3. Check which slots are free in the calendar\n"
+                "  4. Reserve the best matching appointment\n"
+                "  5. Return complete appointment details\n"
+                "\n"
+                "After receiving the result, return a JSON summary with:\n"
+                "  - provider_name, address, rating\n"
+                "  - appointment_time (slot start)\n"
+                "  - score\n"
+                "\n"
+                "The calendar event will be created automatically - you don't need to create it."
             )
         )
         return {**state, "messages": [system, user]}
 
     def node_agent(state: CallState) -> CallState:
-        if "messages" not in state:
-            state = node_init_messages(state)
+        # if "messages" not in state:
+        #     state = node_init_messages(state)
+
         if llm_provider == "ollama":
             from langchain_ollama import ChatOllama
+
+    #         human_prompt = """You are CallPilot, an AI appointment-booking assistant.
+
+    # Rules:
+    # - Use tools to: search providers -> select best option.
+    # - Do NOT invent availability; only use tool results.
+    # - After tool usage, output ONLY valid json matching this schema so that the calender event can be created.
+
+    # {
+    # "provider": {"id": "...", "name": "...", "address": "...", "rating": 0, "distance_km": 0},
+    # "slot": {"start": "YYYY-MM-DDTHH:MM:SS", "end": "YYYY-MM-DDTHH:MM:SS"},
+    # "score": 0
+    # }
+    # """
 
             model = ChatOllama(
                 model=default_ollama_model,
                 base_url=default_ollama_url,
                 temperature=0.4,
             )
-        else:
-            from langchain_openai import ChatOpenAI
 
-            model = ChatOpenAI(model=default_openai_model, temperature=0.4)
+        else:
+            # IMPORTANT: define your non-ollama model here
+            # from langchain_openai import ChatOpenAI
+            # model = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
+            raise ValueError(f"Unsupported llm_provider={llm_provider}")
+
         model = model.bind_tools(tools)
-        response = model.invoke(state["messages"])
-        return {"messages": state.get("messages", []) + [response]}
+
+        # Inject system prompt as the first message
+        messages = state["messages"]
+        # if not messages or messages[0].type != "system":
+        # messages = [HumanMessage(content=human_prompt)] + messages
+
+        # Invoke model
+        resp = model.invoke(messages)
+
+        # Append response to messages
+        state["messages"] = messages + [resp]
+
+        # Try to parse JSON summary from the response content
+        summary = None
+        try:
+            summary = json.loads(resp.content)
+        except Exception:
+            # fallback: keep raw content, you can add a "repair json" step later
+            summary = {"raw": resp.content}
+
+        state["best_option"] = summary
+        return state
 
     def node_finalize(state: CallState) -> CallState:
         last = state["messages"][-1]
         result_text = getattr(last, "content", "")
         return {**state, "result_text": result_text}
+
+
+    def check_calendar_free_tool(start: str, end: str) -> dict:
+        """Check if a time slot is free in the user's calendar.
+        
+        Verifies if the proposed appointment time conflicts with existing events.
+        Uses Google Calendar API when configured, otherwise uses MVP stub data.
+        
+        Args:
+            start: Slot start time as ISO 8601 timestamp (e.g., "2026-02-10T14:00:00")
+            end: Slot end time as ISO 8601 timestamp
+        
+        Returns:
+            {"free": True if available, False if busy}
+        """
+        ok = check_calendar_free({"start": start, "end": end})
+        return ok
+
+    def node_create_calendar_event(state: CallState) -> CallState:
+        """Automatically create calendar event after LLM finds best appointment.
+        
+        Extracts appointment details from tool results and creates calendar event.
+        This runs automatically - not an LLM-callable tool.
+        """
+        print("\n🔹 Executing Node: create_calendar_event")
+        
+        appointment_details = state.get("best_option", {})
+        
+        if not appointment_details:
+            print("⚠️  No appointment details found to create calendar event")
+            return state
+        
+        start = appointment_details.get("slot", {}).get("start")
+        end = appointment_details.get("slot", {}).get("end")
+        ok =check_calendar_free_tool(start, end)
+        
+        if ok:
+            print(f"✓ Slot is free in calendar: {start} to {end}")
+        
+            # Extract details
+            provider = appointment_details["provider"]
+            slot = appointment_details["slot"]
+            
+            # Create calendar event
+            title = f"{state.get('specialty', 'Medical').title()} Appointment - {provider['name']}"
+            location = provider.get("address", "")
+            
+            event_id = create_calendar_event(
+                title=title,
+                slot=slot,
+                location=location
+            )
+            
+            print(f"✓ Calendar event created: {event_id}")
+        
+        else:
+            print(f"⚠️  Slot is NOT free in calendar: {start} to {end}")
+            event_id = None
+        
+        # Update state with event_id
+        return {**state, "event_id": event_id}
 
     def route_after_agent(state: CallState) -> str:
         last = state["messages"][-1]
@@ -299,14 +560,17 @@ def build_graph_mcp():
 
     g = StateGraph(CallState)
     g.add_node("listen_user", node_listen_user)
+    g.add_node("extract_preferences", node_extract_preferences)
     g.add_node("init", node_init_messages)
     g.add_node("agent", node_agent)
     g.add_node("tools", ToolNode(tools))
     g.add_node("finalize", node_finalize)
+    g.add_node("create_event", node_create_calendar_event)
     g.add_node("speak_user", node_speak_user)
 
     g.set_entry_point("listen_user")
-    g.add_edge("listen_user", "init")
+    g.add_edge("listen_user", "extract_preferences")
+    g.add_edge("extract_preferences", "init")
     g.add_edge("init", "agent")
     g.add_conditional_edges(
         "agent",
@@ -314,7 +578,8 @@ def build_graph_mcp():
         {"tools": "tools", "finalize": "finalize"},
     )
     g.add_edge("tools", "agent")
-    g.add_edge("finalize", "speak_user")
+    g.add_edge("finalize", "create_event")
+    g.add_edge("create_event", "speak_user")
     g.add_edge("speak_user", END)
 
     return g.compile()

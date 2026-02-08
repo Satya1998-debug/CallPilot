@@ -22,8 +22,11 @@ class Settings:
     Attributes:
         providers_path: Path to the JSON file containing provider data.
                        Can be set via PROVIDERS_PATH environment variable.
+        use_google_apis: Whether to use real Google APIs (Calendar, Places, Maps).
+                        Set to False to use MVP stubs. Default: True if API keys present.
     """
     providers_path: str = os.getenv("PROVIDERS_PATH", "callpilot/data/providers.json")
+    use_google_apis: bool = os.getenv("USE_GOOGLE_APIS", "true").lower() in {"true", "1", "yes"}
 
 # Global settings instance - import this in other modules
 settings = Settings()
