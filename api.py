@@ -297,6 +297,9 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 requires_confirmation=False
             )
 
+@app.get("/ping")
+def ping():
+    return {"ok": True}
 
 @app.post("/chat/confirm")
 async def chat_confirm(req: ConfirmRequest) -> ChatResponse:
@@ -334,3 +337,7 @@ async def chat_confirm(req: ConfirmRequest) -> ChatResponse:
             error=str(e),
             requires_confirmation=False
         )
+        
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)

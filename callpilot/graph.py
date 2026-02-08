@@ -15,6 +15,11 @@ from .tools.providers import search_providers
 from .adapters.receptionist_sim import simulate_receptionist_call, reserve_slot
 from .tools.calendar import check_calendar_free, create_calendar_event
 from .tools.scoring import score
+from dotenv import load_dotenv
+from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.prebuilt import ToolNode
+
 
 # Cache for MCP graph to avoid rebuilding
 _mcp_graph_cache = None
@@ -233,6 +238,30 @@ def node_done(state: CallState) -> CallState:
         }
     }
 
+_MCP_CLIENT = None
+_MCP_TOOLS = None
+
+def get_mcp_url() -> str:
+    return os.getenv("MCP_URL", "http://127.0.0.1:8001/mcp")
+
+async def _get_client() -> MultiServerMCPClient:
+    global _MCP_CLIENT
+    if _MCP_CLIENT is None:
+        _MCP_CLIENT = MultiServerMCPClient(
+            {"callpilot": {"url": get_mcp_url(), "transport": "http"}}
+        )
+    return _MCP_CLIENT
+
+async def _get_tools_async():
+    global _MCP_TOOLS
+    if _MCP_TOOLS is None:
+        client = await _get_client()
+        _MCP_TOOLS = await client.get_tools()
+    return _MCP_TOOLS
+
+def get_tools_sync():
+    """Use this in CLI mode (python main.py)."""
+    return asyncio.run(_get_tools_async())
 
 def build_graph_mcp():
     """Build and compile the LLM + MCP tool-calling graph."""
@@ -242,11 +271,6 @@ def build_graph_mcp():
     if _mcp_graph_cache is not None:
         return _mcp_graph_cache
     
-    from dotenv import load_dotenv
-    from langchain_core.messages import SystemMessage, HumanMessage
-    from langchain_mcp_adapters.client import MultiServerMCPClient
-    from langgraph.prebuilt import ToolNode
-
     load_dotenv()
 
     default_mcp_url = os.getenv("MCP_URL", "http://localhost:8000/mcp")
@@ -255,31 +279,24 @@ def build_graph_mcp():
     default_ollama_model = os.getenv("OLLAMA_MODEL", "qwen2.5:14b")
     default_ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
-    async def get_mcp_client():
-        return MultiServerMCPClient(
-            {
-                "callpilot": {
-                    "url": default_mcp_url,
-                    "transport": "http",
-                }
-            }
-        )
+    # async def get_mcp_client():
+    #     return MultiServerMCPClient(
+    #         {
+    #             "callpilot": {
+    #                 "url": default_mcp_url,
+    #                 "transport": "http",
+    #             }
+    #         }
+    #     )
 
-    async def get_mcp_tools():
-        client = await get_mcp_client()
-        return await client.get_tools()
+    # async def get_mcp_tools():
+    #     client = await get_mcp_client()
+    #     return await client.get_tools()
 
-    # Handle async initialization properly - avoid nested event loop issues
-    try:
-        loop = asyncio.get_running_loop()
-        # We're in an async context, use nest_asyncio or create task
-        import nest_asyncio
-        nest_asyncio.apply()
-        tools = asyncio.run(get_mcp_tools())
-    except RuntimeError:
-        # No event loop running, safe to use asyncio.run
-        tools = asyncio.run(get_mcp_tools())
-
+    # No event loop running, safe to use asyncio.run
+    # tools = asyncio.run(get_mcp_tools())
+    tools = get_tools_sync()
+    
     def node_extract_preferences(state: CallState) -> CallState:
         """Extract appointment preferences from user's natural language query.
         
@@ -562,7 +579,6 @@ def build_graph_mcp():
         last = state["messages"][-1]
         result_text = getattr(last, "content", "")
         return {**state, "result_text": result_text}
-
 
     def check_calendar_free_tool(start: str, end: str) -> dict:
         """Check if a time slot is free in the user's calendar.
