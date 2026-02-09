@@ -404,7 +404,7 @@ MIT License - see LICENSE file for details
 ## 👥 Authors
 
 Built for the MIT Global AI Hackathon 2026 - ElevenLabs Challenge
-Collaborated with (Ankita Sen)[https://www.linkedin.com/in/ankita-sen-185955146/]
+Collaborated with [Ankita Sen](https://www.linkedin.com/in/ankita-sen-185955146/)
 
 ---
 
